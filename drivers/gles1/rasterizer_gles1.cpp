@@ -4305,6 +4305,10 @@ void RasterizerGLES1::end_scene() {
 	depth_write=true;
 	depth_test=true;
 
+	glScissor(viewport.x, window_size.height - (viewport.height + viewport.y), viewport.width, viewport.height);
+
+	glEnable(GL_SCISSOR_TEST);
+
 	if (scene_fx && scene_fx->skybox_active) {
 
 		//skybox
@@ -4316,13 +4320,15 @@ void RasterizerGLES1::end_scene() {
 
 		glClearColor(0.3,0.3,0.3,1.0);
 	}
-#ifdef GLES_OVER_GL
-	//glClearDepth(1.0);
+#ifdef GLEW_ENABLED // GLES_OVER_GL
+	glClearDepth(1.0);
 #else
 	//glClearDepthf(1.0);
 #endif
 
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+	glDisable(GL_SCISSOR_TEST);
 
 	if (scene_fx && scene_fx->fog_active) {
 
@@ -5764,7 +5770,7 @@ void RasterizerGLES1::_update_framebuffer() {
 
 void RasterizerGLES1::init() {
 
-#ifdef GLES_OVER_GL
+#ifdef GLEW_ENABLED // GLES_OVER_GL
 	glewInit();
 #endif
 
