@@ -1755,6 +1755,8 @@ bool GDScript::_update_exports() {
 
 	return changed;
 
+#else
+	return false;
 #endif
 }
 
