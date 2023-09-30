@@ -1066,7 +1066,11 @@ void OS_Windows::initialize(const VideoMode& p_desired,int p_video_driver,int p_
 #if defined(OPENGL_ENABLED) || defined(GLES2_ENABLED) || defined(LEGACYGL_ENABLED)
 	gl_context = memnew( ContextGL_Win(hWnd,false) );
 	gl_context->initialize();
+	#if defined(GLES2_ENABLED) 
 	rasterizer = memnew( RasterizerGLES2 );
+	#else
+	rasterizer = memnew( RasterizerGLES1 );
+	#endif
 #else
  #ifdef DX9_ENABLED
 	rasterizer = memnew( RasterizerDX9(hWnd) );
