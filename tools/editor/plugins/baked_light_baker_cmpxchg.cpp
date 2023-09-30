@@ -33,6 +33,18 @@ void baked_light_baker_add_64i(int64_t *dst,int64_t value) {
 
 #include "windows.h"
 
+inline LONGLONG _InterlockedCompareExchange64(LONGLONG volatile* Destination, LONGLONG Exchange, LONGLONG Comperand)
+{
+	__asm {
+		mov esi, [Destination]
+		mov ebx, dword ptr [Exchange]
+		mov ecx, dword ptr [Exchange + 4]
+		mov eax, dword ptr [Comperand]
+		mov edx, dword ptr [Comperand + 4]
+		lock cmpxchg8b [esi]
+	}
+}
+
 void baked_light_baker_add_64f(double *dst,double value) {
 
 	union {
@@ -46,7 +58,7 @@ void baked_light_baker_add_64f(double *dst,double value) {
 		int64_t from = swapy.i;
 		swapy.f+=value;
 		int64_t to=swapy.i;
-		int64_t result = InterlockedCompareExchange64((int64_t*)dst,to,from);
+		int64_t result = _InterlockedCompareExchange64((int64_t*)dst,to,from);
 		if (result==from)
 			break;
 	}
@@ -58,7 +70,7 @@ void baked_light_baker_add_64i(int64_t *dst,int64_t value) {
 	while(true) {
 		int64_t from = *dst;
 		int64_t to = from+value;
-		int64_t result = InterlockedCompareExchange64(dst,to,from);
+		int64_t result = _InterlockedCompareExchange64(dst,to,from);
 		if (result==from)
 			break;
 	}
