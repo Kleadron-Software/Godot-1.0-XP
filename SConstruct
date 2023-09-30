@@ -1,4 +1,4 @@
-EnsureSConsVersion(0,14);
+EnsureSConsVersion(0, 98, 1)
 
 import string
 import os
@@ -57,8 +57,8 @@ custom_tools=['default']
 if (os.name=="posix"):
 	pass
 elif (os.name=="nt"):
-    if (os.getenv("VSINSTALLDIR")==None):
-	custom_tools=['mingw']
+	if (os.getenv("VSINSTALLDIR")==None):
+		custom_tools=['mingw']
 
 env_base=Environment(tools=custom_tools,ENV = {'PATH' : os.environ['PATH']});
 #env_base=Environment(tools=custom_tools);
@@ -76,6 +76,11 @@ env_base.__class__.android_module_manifest = methods.android_module_manifest
 env_base.__class__.disable_module = methods.disable_module
 
 env_base.__class__.add_source_files = methods.add_source_files
+
+env_base.__class__.add_shared_library = methods.add_shared_library
+env_base.__class__.add_library = methods.add_library
+env_base.__class__.add_program = methods.add_program
+env_base.__class__.CommandNoCache = methods.CommandNoCache
 
 customs = ['custom.py']
 
@@ -116,6 +121,8 @@ opts.Add("CFLAGS", "Custom flags for the C compiler");
 opts.Add("LINKFLAGS", "Custom flags for the linker");
 opts.Add('disable_3d', 'Disable 3D nodes for smaller executable (yes/no)', "no")
 opts.Add('disable_advanced_gui', 'Disable advance 3D gui nodes and behaviors (yes/no)', "no")
+opts.Add('vsproj', "Generate Visual Studio Project. (yes/no)", 'no')
+opts.Add('vsproj_jobs', "Number of parallel builds", '2')
 
 # add platform specific options
 
@@ -170,6 +177,26 @@ if selected_platform in platform_list:
 	else:
 		env = env_base.Clone()
 
+	if env['vsproj'] == "yes":
+		env.vs_incs = []
+		env.vs_srcs = []
+
+	def AddToVSProject(sources):
+		for x in sources:
+			if type(x) == type(""):
+				fname = env.File(x).path
+			else:
+				fname = env.File(x)[0].path
+			pieces = fname.split(".")
+			if len(pieces) > 0:
+				basename = pieces[0]
+				basename = basename.replace('\\\\', '/')
+				env.vs_srcs = env.vs_srcs + [basename + ".cpp"]
+				env.vs_incs = env.vs_incs + [basename + ".h"]
+				# print basename
+	env.AddToVSProject = AddToVSProject
+
+
 	env.extra_suffix=""
 
 	CCFLAGS = env.get('CCFLAGS', '')
@@ -195,7 +222,7 @@ if selected_platform in platform_list:
 		if not (f[0] in ARGUMENTS): # allow command line to override platform flags
 			env[f[0]] = f[1]
 
-        #env['platform_libsuffix'] = env['LIBSUFFIX']
+		#env['platform_libsuffix'] = env['LIBSUFFIX']
 
 	suffix="."+selected_platform
 
@@ -250,10 +277,10 @@ if selected_platform in platform_list:
 
 	if (env['musepack']=='yes'):
 		env.Append(CPPFLAGS=['-DMUSEPACK_ENABLED']);
-        if (env['openssl']!='no'):
-            env.Append(CPPFLAGS=['-DOPENSSL_ENABLED']);
-            if (env['openssl']=="builtin"):
-                env.Append(CPPPATH=['#drivers/builtin_openssl2'])
+		if (env['openssl']!='no'):
+			env.Append(CPPFLAGS=['-DOPENSSL_ENABLED']);
+			if (env['openssl']=="builtin"):
+				env.Append(CPPPATH=['#drivers/builtin_openssl2'])
 
 	if (env["builtin_zlib"]=='yes'):
 		env.Append(CPPPATH=['#drivers/builtin_zlib/zlib'])
@@ -315,6 +342,11 @@ if selected_platform in platform_list:
 	SConscript("main/SCsub")
 
 	SConscript("platform/"+selected_platform+"/SCsub"); # build selected platform
+	
+	# Microsoft Visual Studio Project Generation
+	if (env['vsproj']) == "yes":
+		env['CPPPATH'] = [Dir(path) for path in env['CPPPATH']]
+		methods.generate_vs_project(env, env['vsproj_jobs'])
 
 else:
 
