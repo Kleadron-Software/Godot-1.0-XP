@@ -111,6 +111,9 @@ TestResult.xml
 *.pidb
 *.svclog
 *.scc
+*.inc
+*.vcxproj
+*.vcxproj.filters
 
 # Chutzpah Test files
 _Chutzpah*
