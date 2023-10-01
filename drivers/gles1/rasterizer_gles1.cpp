@@ -38,6 +38,12 @@
 #include "gl_context/context_gl.h"
 #include <string.h>
 
+#ifdef GLEW_ENABLED
+#define _glClearDepth glClearDepth
+#else
+#define _glClearDepth glClearDepthf
+#endif
+
 _FORCE_INLINE_ static void _gl_load_transform(const Transform& tr) {
 
 	GLfloat matrix[16]={ /* build a 16x16 matrix */
@@ -4053,19 +4059,25 @@ void RasterizerGLES1::_render(const Geometry *p_geometry,const Material *p_mater
 
 			if (s->index_array_len>0) {
 
-
+				glMatrixMode(GL_MODELVIEW);
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,s->index_id);
 				for(int i=0;i<element_count;i++) {
 					//glUniformMatrix4fv(material_shader.get_uniform_location(MaterialShaderGLES1::INSTANCE_TRANSFORM), 1, false, elements[i].matrix);
+					glPushMatrix();
+					glMultMatrixf(elements[i].matrix);
 					glDrawElements(gl_primitive[s->primitive],s->index_array_len, (s->array_len>(1<<16))?GL_UNSIGNED_SHORT:GL_UNSIGNED_SHORT,0);
+					glPopMatrix();
 				}
 
 
 			} else {
-
+				glMatrixMode(GL_MODELVIEW);
 				for(int i=0;i<element_count;i++) {
 //					glUniformMatrix4fv(material_shader.get_uniform_location(MaterialShaderGLES1::INSTANCE_TRANSFORM), 1, false, elements[i].matrix);
+					glPushMatrix();
+					glMultMatrixf(elements[i].matrix);
 					glDrawArrays(gl_primitive[s->primitive],0,s->array_len);
+					glPopMatrix();
 				}
 
 
@@ -4308,6 +4320,7 @@ void RasterizerGLES1::end_scene() {
 	glScissor(viewport.x, window_size.height - (viewport.height + viewport.y), viewport.width, viewport.height);
 
 	glEnable(GL_SCISSOR_TEST);
+	_glClearDepth(1.0);
 
 	if (scene_fx && scene_fx->skybox_active) {
 
@@ -4320,11 +4333,6 @@ void RasterizerGLES1::end_scene() {
 
 		glClearColor(0.3,0.3,0.3,1.0);
 	}
-#ifdef GLEW_ENABLED // GLES_OVER_GL
-	glClearDepth(1.0);
-#else
-	//glClearDepthf(1.0);
-#endif
 
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
@@ -4978,10 +4986,15 @@ void RasterizerGLES1::canvas_draw_polygon(int p_vertex_count, const int* p_indic
 		glColor4f(m.r, m.g, m.b, m.a);
 	} else if (!p_colors) {
 		glColor4f(1, 1, 1, canvas_opacity);
-	} else
+	} 
+	else
+	{
 		do_colors=true;
+		// default color
+		glColor4f(1, 1, 1, 1);
+	}
 
-	glColor4f(1, 1, 1, 1);
+	//glColor4f(1, 1, 1, 1);
 
 	Texture* texture = NULL;
 	if (p_texture.is_valid()) {
