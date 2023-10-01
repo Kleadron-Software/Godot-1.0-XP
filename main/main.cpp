@@ -147,8 +147,8 @@ void Main::print_help(const char* p_binary) {
 			OS::get_singleton()->print(", ");
 		OS::get_singleton()->print("%s",OS::get_singleton()->get_audio_driver_name(i));
 	}
-	OS::get_singleton()->print("\t-rthread <mode>\t : Render Thread Mode ('unsafe', 'safe', 'separate).");
 	OS::get_singleton()->print(")\n");
+	OS::get_singleton()->print("\t-rthread <mode>\t : Render Thread Mode ('unsafe', 'safe', 'separate).\n");
 	OS::get_singleton()->print("\t-s,-script [script] : Run a script.\n");	
 	OS::get_singleton()->print("\t-d,-debug : Debug (local stdout debugger).\n");
 	OS::get_singleton()->print("\t-rdebug ADDRESS : Remote debug (<ip>:<port> host address).\n");
