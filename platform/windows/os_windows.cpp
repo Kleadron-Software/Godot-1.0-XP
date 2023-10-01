@@ -129,12 +129,19 @@ void RedirectIOToConsole() {
 }
 
 int OS_Windows::get_video_driver_count() const {
-
+#if defined(GLES1_ENABLED) && defined(GLES2_ENABLED)
 	return 2;
+#else
+	return 1;
+#endif
 }
 const char * OS_Windows::get_video_driver_name(int p_driver) const {
-
-	return p_driver==0?"GLES2":"GLES1";
+#if defined(GLES1_ENABLED) && defined(GLES2_ENABLED)
+	return p_driver==0?"GLES1":"GLES2";
+#else
+	return "GLES1";
+#endif
+	
 }
 
 OS::VideoMode OS_Windows::get_default_video_mode() const {
@@ -1066,11 +1073,20 @@ void OS_Windows::initialize(const VideoMode& p_desired,int p_video_driver,int p_
 #if defined(OPENGL_ENABLED) || defined(GLES2_ENABLED) || defined(LEGACYGL_ENABLED)
 	gl_context = memnew( ContextGL_Win(hWnd,false) );
 	gl_context->initialize();
-	#if defined(GLES2_ENABLED) 
-	rasterizer = memnew( RasterizerGLES2 );
-	#else
+ #if defined(GLES2_ENABLED) 
+	// apparently GLES2 is id 0 and GLES1 is ID 1... Let's fix that.
+	if (p_video_driver == 0)
+	{
+		rasterizer = memnew( RasterizerGLES1 );
+	}
+	else
+	{
+		rasterizer = memnew( RasterizerGLES2 );
+	}
+ #else
+	// only one to pick from
 	rasterizer = memnew( RasterizerGLES1 );
-	#endif
+ #endif
 #else
  #ifdef DX9_ENABLED
 	rasterizer = memnew( RasterizerDX9(hWnd) );
