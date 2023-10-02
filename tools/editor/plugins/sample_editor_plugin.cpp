@@ -104,8 +104,12 @@ void SampleEditor::generate_preview_texture(const Ref<Sample>& p_sample,Ref<Imag
 			float max[2]={-1e10,-1e10};
 			float min[2]={1e10,1e10};
 			int c=stereo?2:1;
-			int from = i*len/w;
-			int to = (i+1)*len/w;
+			// the numbers have to be larger otherwise it breaks the preview
+			uint32_t from = (uint32_t)((uint64_t)i*(uint64_t)len/(uint64_t)w);
+			uint32_t to = (uint32_t)((uint64_t)(i+1)*(uint64_t)len/(uint64_t)w);
+
+			if (from < 0)
+				from = 0;
 			if (to>=len)
 				to=len-1;
 
@@ -114,7 +118,7 @@ void SampleEditor::generate_preview_texture(const Ref<Sample>& p_sample,Ref<Imag
 
 				for(int j=0;j<c;j++) {
 
-					for(int k=from;k<=to;k++) {
+					for(uint32_t k=from;k<=to;k++) {
 
 						float v = src[k*c+j]/32768.0;
 						if (v>max[j])
