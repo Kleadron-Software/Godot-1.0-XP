@@ -3351,17 +3351,18 @@ void RasterizerGLES1::_setup_material(const Geometry *p_geometry,const Material 
 				 case VS::MATERIAL_BLEND_MODE_ADD: {
 
 					//glBlendEquation(GL_FUNC_ADD);
-					glBlendFunc(GL_SRC_ALPHA,GL_ONE);
+					glBlendFunc(GL_SRC_COLOR,GL_ONE);
 
 				 } break;
 				 case VS::MATERIAL_BLEND_MODE_SUB: {
 
 					//glBlendEquation(GL_FUNC_SUBTRACT);
-					glBlendFunc(GL_SRC_ALPHA,GL_ONE);
+					glBlendFunc(GL_ZERO,GL_ONE_MINUS_SRC_COLOR);
+					
 				 } break;
 				case VS::MATERIAL_BLEND_MODE_MUL: {
 					//glBlendEquation(GL_FUNC_ADD);
-					glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+					glBlendFunc(GL_DST_COLOR,GL_ZERO);
 
 				} break;
 
