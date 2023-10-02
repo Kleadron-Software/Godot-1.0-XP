@@ -1484,6 +1484,7 @@ def generate_vs_project(env, num_jobs):
 		env.AddToVSProject(env.modules_sources)
 		env.AddToVSProject(env.scene_sources)
 		env.AddToVSProject(env.servers_sources)
+		env.AddToVSProject(env.drivers_sources)
 		#env.AddToVSProject(env.editor_sources)
 
 		env['MSVSBUILDCOM'] = build_commandline('scons --directory=$(ProjectDir) platform=windows target=$(Configuration) tools=!tools! -j' + str(num_jobs))
