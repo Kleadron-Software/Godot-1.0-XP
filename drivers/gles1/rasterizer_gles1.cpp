@@ -5674,7 +5674,7 @@ void RasterizerGLES1::ShadowBuffer::init(int p_size) {
 }
 
 void RasterizerGLES1::_init_shadow_buffers() {
-
+#if 0
 	int near_shadow_size=GLOBAL_DEF("rasterizer/near_shadow_size",512);
 	int far_shadow_size=GLOBAL_DEF("rasterizer/far_shadow_size",64);
 
@@ -5692,7 +5692,7 @@ void RasterizerGLES1::_init_shadow_buffers() {
 
 		far_shadow_buffers[i].init(far_shadow_size);
 	}
-
+#endif
 }
 
 
