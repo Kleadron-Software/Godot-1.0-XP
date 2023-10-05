@@ -5848,7 +5848,8 @@ void RasterizerGLES1::init() {
 	glBindTexture(GL_TEXTURE_2D,white_tex);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 8, 8, 0, GL_RGB, GL_UNSIGNED_BYTE,whitetexdata);
 
-	npo2_textures_available=false;
+	//npo2_textures_available=false;
+	npo2_textures_available=extensions.has("GL_ARB_texture_non_power_of_two") && GLOBAL_DEF("rasterizer/allow_npo2_textures", true);
 	pvr_supported=extensions.has("GL_IMG_texture_compression_pvrtc");
 	etc_supported=true;
 	s3tc_supported=false;
