@@ -2261,10 +2261,10 @@ void PropertyEditor::update_tree() {
 				} else {
 					if (p.type == Variant::REAL) {
 
-						item->set_range_config(1, -65536, 65535, 0.01);
+						item->set_range_config(1, -2147483647, 2147483646, 0.01);
 					} else {
 
-						item->set_range_config(1, -65536, 65535, 1);
+						item->set_range_config(1, -2147483647, 2147483646, 1);
 					}
 				};
 
