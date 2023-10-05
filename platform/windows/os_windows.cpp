@@ -1062,7 +1062,7 @@ void OS_Windows::initialize(const VideoMode& p_desired,int p_video_driver,int p_
 		video_mode.fullscreen = false;
 	} else {
 
-		if (!(hWnd=CreateWindowExW(dwExStyle,L"Engine",L"", dwStyle|WS_CLIPSIBLINGS|WS_CLIPCHILDREN, 0, 0,WindowRect.right-WindowRect.left,WindowRect.bottom-WindowRect.top, NULL,NULL,	hInstance,NULL))) {
+		if (!(hWnd=CreateWindowExW(dwExStyle,L"Engine",L"", dwStyle|WS_CLIPSIBLINGS|WS_CLIPCHILDREN, CW_USEDEFAULT, CW_USEDEFAULT,WindowRect.right-WindowRect.left,WindowRect.bottom-WindowRect.top, NULL,NULL,	hInstance,NULL))) {
 			MessageBoxW(NULL,L"Window Creation Error.",L"ERROR",MB_OK|MB_ICONEXCLAMATION);
 			return;								// Return FALSE
 		}
