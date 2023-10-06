@@ -4701,6 +4701,8 @@ void RasterizerGLES1::reset_state() {
 	glLineWidth(1.0);
 	glDisable(GL_LIGHTING);
 	
+	// need to reset this, otherwise it forgets when texture gen is disabled
+	texcoord_mode=0;
 	glDisable(GL_TEXTURE_GEN_S);
 	glDisable(GL_TEXTURE_GEN_T);
 }
