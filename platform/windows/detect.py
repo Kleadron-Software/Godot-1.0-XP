@@ -112,7 +112,7 @@ def configure(env):
 		env.Append(CCFLAGS=['/DWIN32'])
 		env.Append(CCFLAGS=['/DTYPED_METHOD_BIND'])
 
-		#env.Append(CCFLAGS=['/DGLES2_ENABLED'])
+		env.Append(CCFLAGS=['/DGLES2_ENABLED'])
 		env.Append(CCFLAGS=['/DGLES1_ENABLED'])
 		env.Append(CCFLAGS=['/DLEGACYGL_ENABLED'])
 		env.Append(CCFLAGS=['/DGLEW_ENABLED'])
@@ -209,7 +209,7 @@ def configure(env):
 		env.Append(CCFLAGS=['-DWINDOWS_ENABLED','-mwindows'])
 		env.Append(CPPFLAGS=['-DRTAUDIO_ENABLED'])
 		#env.Append(CCFLAGS=['-DGLES2_ENABLED','-DGLES1_ENABLED','-DGLEW_ENABLED'])
-		env.Append(CCFLAGS=['-DLEGACYGL_ENABLED','-DGLES1_ENABLED','-DGLEW_ENABLED'])
+		env.Append(CCFLAGS=['-DGLES2_ENABLED','-DLEGACYGL_ENABLED','-DGLES1_ENABLED','-DGLEW_ENABLED'])
 		env.Append(LIBS=['mingw32','opengl32', 'dsound', 'ole32', 'd3d9','winmm','gdi32','iphlpapi','wsock32','kernel32'])
 
 		if (env["bits"]=="32" and env["mingw64_for_32"]!="yes"):
