@@ -277,7 +277,7 @@ void Room::_bind_methods() {
 
 
 
-	ADD_PROPERTY( PropertyInfo( Variant::OBJECT, "room/room", PROPERTY_HINT_RESOURCE_TYPE, "Area" ), _SCS("set_room"), _SCS("get_room") );
+	ADD_PROPERTY( PropertyInfo( Variant::OBJECT, "room/room", PROPERTY_HINT_RESOURCE_TYPE, "RoomBounds" ), _SCS("set_room"), _SCS("get_room") );
 	ADD_PROPERTY( PropertyInfo( Variant::BOOL, "room/simulate_acoustics"), _SCS("set_simulate_acoustics"), _SCS("is_simulating_acoustics") );
 }
 
