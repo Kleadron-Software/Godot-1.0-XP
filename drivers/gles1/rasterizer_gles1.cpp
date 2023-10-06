@@ -3376,6 +3376,27 @@ void RasterizerGLES1::_setup_material(const Geometry *p_geometry,const Material 
 			}
 			blend_mode=p_material->blend_mode;
 		}
+		
+		if (texcoord_mode!=p_material->texcoord_mode[0]) {
+			switch(p_material->texcoord_mode[0]) {
+				
+				case VS::FIXED_MATERIAL_TEXCOORD_UV: {
+					
+						glDisable(GL_TEXTURE_GEN_S);
+						glDisable(GL_TEXTURE_GEN_T);
+				} break;
+				
+				case VS::FIXED_MATERIAL_TEXCOORD_SPHERE: {
+					
+					    glTexGeni(GL_S,GL_TEXTURE_GEN_MODE,GL_SPHERE_MAP);
+						glTexGeni(GL_T,GL_TEXTURE_GEN_MODE,GL_SPHERE_MAP);
+
+						glEnable(GL_TEXTURE_GEN_S);
+						glEnable(GL_TEXTURE_GEN_T);
+				} break;
+			}
+			texcoord_mode=p_material->texcoord_mode[0];
+		}
 
 		if (lighting!=!p_material->flags[VS::MATERIAL_FLAG_UNSHADED]) {
 			if (p_material->flags[VS::MATERIAL_FLAG_UNSHADED]) {
@@ -4679,7 +4700,9 @@ void RasterizerGLES1::reset_state() {
 	canvas_blend=VS::MATERIAL_BLEND_MODE_MIX;
 	glLineWidth(1.0);
 	glDisable(GL_LIGHTING);
-
+	
+	glDisable(GL_TEXTURE_GEN_S);
+	glDisable(GL_TEXTURE_GEN_T);
 }
 
 _FORCE_INLINE_ static void _set_glcoloro(const Color& p_color,const float p_opac) {

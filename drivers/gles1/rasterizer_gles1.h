@@ -758,6 +758,7 @@ class RasterizerGLES1 : public Rasterizer {
 	bool depth_write;
 	bool depth_test;
 	int blend_mode;
+	int texcoord_mode;
 	bool lighting;
 
 	_FORCE_INLINE_ void _add_geometry( const Geometry* p_geometry, const InstanceData *p_instance, const Geometry *p_geometry_cmp, const GeometryOwner *p_owner);
