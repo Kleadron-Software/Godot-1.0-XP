@@ -317,7 +317,7 @@ static int _bsp_find_best_half_plane(const Face3* p_faces,const Vector<int>& p_i
 
 			for(int k=0;k<3;k++) {
 
-				float d = p.distance_to(g.vertex[j]);
+				float d = p.distance_to(g.vertex[k]);
 
 				if (Math::abs(d)>p_tolerance) {
 
