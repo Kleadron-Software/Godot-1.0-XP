@@ -3102,6 +3102,7 @@ void RasterizerGLES1::_add_geometry( const Geometry* p_geometry, const InstanceD
 	int light_count=0;
 
 	RenderList *render_list=&opaque_render_list;
+	// should the blend mode really override "use alpha"?
 	if (m->fixed_flags[VS::FIXED_MATERIAL_FLAG_USE_ALPHA] || m->blend_mode!=VS::MATERIAL_BLEND_MODE_MIX) {
 		render_list = &alpha_render_list;
 	};
@@ -3612,7 +3613,7 @@ static const GLenum gl_client_states[] = {
 	GL_VERTEX_ARRAY,
 	GL_NORMAL_ARRAY,
 	0, // ARRAY_TANGENT
-	0,//GL_COLOR_ARRAY,
+	GL_COLOR_ARRAY,//GL_COLOR_ARRAY,
 	GL_TEXTURE_COORD_ARRAY, // ARRAY_TEX_UV
 	0,//GL_TEXTURE_COORD_ARRAY, // ARRAY_TEX_UV2
 	0, // ARRAY_BONES
