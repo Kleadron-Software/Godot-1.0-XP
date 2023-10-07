@@ -9090,6 +9090,7 @@ void RasterizerGLES2::init() {
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 	skinned_buffer_size = GLOBAL_DEF("rasterizer/skinned_buffer_size",DEFAULT_SKINNED_BUFFER_SIZE);
+	skinned_buffer_size *= 1024;
 	skinned_buffer = memnew_arr( uint8_t, skinned_buffer_size );
 
 	glGenTextures(1, &white_tex);
