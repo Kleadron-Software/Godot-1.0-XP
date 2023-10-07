@@ -451,6 +451,7 @@ public:
 	Ref<FixedMaterial> light_material_omni_icon;
 	Ref<FixedMaterial> light_material_directional_icon;
 	Ref<FixedMaterial> camera_material;
+	Ref<FixedMaterial> mesh_instance_material;
 	Ref<FixedMaterial> skeleton_material;
 	Ref<FixedMaterial> room_material;
 	Ref<FixedMaterial> portal_material;

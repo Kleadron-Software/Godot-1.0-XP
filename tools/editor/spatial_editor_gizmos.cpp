@@ -35,6 +35,7 @@
 #include "scene/resources/capsule_shape.h"
 #include "scene/resources/ray_shape.h"
 #include "scene/resources/convex_polygon_shape.h"
+#include "scene/resources/concave_polygon_shape.h"
 #include "scene/resources/plane_shape.h"
 #include "quick_hull.h"
 
@@ -1169,13 +1170,42 @@ CameraSpatialGizmo::CameraSpatialGizmo(Camera* p_camera){
 
 void MeshInstanceSpatialGizmo::redraw() {
 
+	clear();
+
+	if (!mesh->is_visible())
+		return; // don't generate graphics
+
 	Ref<Mesh> m = mesh->get_mesh();
 	if (!m.is_valid())
 		return; //none
 
 	Ref<TriangleMesh> tm = m->generate_triangle_mesh();
-	if (tm.is_valid())
+	if (tm.is_valid()) {
+		
 		add_collision_triangles(tm);
+		/*
+		DVector<Face3> faces = tm->get_faces();
+		Vector<Vector3> lines;
+
+#undef ADD_TRIANGLE
+#define ADD_TRIANGLE( m_a, m_b, m_c)\
+{\
+	lines.push_back(m_a);\
+	lines.push_back(m_b);\
+	lines.push_back(m_b);\
+	lines.push_back(m_c);\
+	lines.push_back(m_c);\
+	lines.push_back(m_a);\
+}
+
+		for(int i = 0; i < faces.size(); i++)
+		{
+			ADD_TRIANGLE(faces[i].vertex[0], faces[i].vertex[1], faces[i].vertex[2]);
+		}
+		
+		add_lines(lines,SpatialEditorGizmos::singleton->mesh_instance_material);
+		*/
+	}
 }
 
 MeshInstanceSpatialGizmo::MeshInstanceSpatialGizmo(MeshInstance* p_mesh) {
@@ -2096,6 +2126,39 @@ void CollisionShapeSpatialGizmo::redraw(){
 
 			}
 		}
+
+	}
+	
+	if (s->cast_to<ConcavePolygonShape>()) {
+		
+		DVector<Vector3> faces = s->cast_to<ConcavePolygonShape>()->get_faces();
+		
+		Ref<TriangleMesh> tmesh = memnew( TriangleMesh);
+		tmesh->create(faces);
+		add_collision_triangles(tmesh);
+		
+		Vector<Vector3> lines;
+
+#undef ADD_TRIANGLE
+#define ADD_TRIANGLE( m_a, m_b, m_c)\
+{\
+	lines.push_back(m_a);\
+	lines.push_back(m_b);\
+	lines.push_back(m_b);\
+	lines.push_back(m_c);\
+	lines.push_back(m_c);\
+	lines.push_back(m_a);\
+}
+		
+		// for some bizzare reason, ConcavePolygonShape::get_faces returns a Vector3 array while
+		// TriangleMesh::get_faces returns a Face3 array.
+		int facecount = faces.size();
+		for(int i = 0; i < facecount; i += 3)
+		{
+			ADD_TRIANGLE(faces[i], faces[i+1], faces[i+2]);
+		}
+		
+		add_lines(lines,SpatialEditorGizmos::singleton->shape_material);
 
 	}
 
@@ -3056,7 +3119,9 @@ SpatialEditorGizmos::SpatialEditorGizmos() {
 	light_material_directional_icon->set_texture(FixedMaterial::PARAM_DIFFUSE,SpatialEditor::get_singleton()->get_icon("GizmoDirectionalLight","EditorIcons"));
 
 	camera_material = create_line_material(Color(1.0,0.5,1.0));
-
+	
+	mesh_instance_material = create_line_material(Color(0.1,1.0,0.5));
+	//mesh_instance_material->set_fixed_flag(FixedMaterial::FLAG_USE_COLOR_ARRAY, false);
 
 	navmesh_edge_material = create_line_material(Color(0.1,0.8,1.0));
 	navmesh_solid_material = create_solid_material(Color(0.1,0.8,1.0,0.4));
