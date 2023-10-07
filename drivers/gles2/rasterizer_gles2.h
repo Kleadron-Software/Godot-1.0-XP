@@ -66,7 +66,7 @@ class RasterizerGLES2 : public Rasterizer {
 		MAX_SCENE_LIGHTS=2048,
 		LIGHT_SPOT_BIT=0x80,
 		DEFAULT_SKINNED_BUFFER_SIZE = 2048 * 1024, // 10k vertices
-		MAX_HW_LIGHTS = 1,
+		MAX_HW_LIGHTS = 8,
 	};
 
 
@@ -826,7 +826,7 @@ class RasterizerGLES2 : public Rasterizer {
 
 		enum {
 			MAX_ELEMENTS=4096,
-			MAX_LIGHTS=4,
+			//MAX_LIGHTS=4,
 			SORT_FLAG_SKELETON=1,
 			SORT_FLAG_INSTANCING=2,
 		};

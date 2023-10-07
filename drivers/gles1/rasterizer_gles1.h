@@ -62,7 +62,7 @@ class RasterizerGLES1 : public Rasterizer {
 		MAX_SCENE_LIGHTS=2048,
 		LIGHT_SPOT_BIT=0x80,
 		DEFAULT_SKINNED_BUFFER_SIZE = 1024 * 1024, // 10k vertices
-		MAX_HW_LIGHTS = 1,
+		MAX_HW_LIGHTS = 8,
 	};
 
 
@@ -577,7 +577,7 @@ class RasterizerGLES1 : public Rasterizer {
 
 		enum {
 			MAX_ELEMENTS=4096,
-			MAX_LIGHTS=4
+			MAX_LIGHTS=4 // needs to be 4 since the light key is a union. In theory, it could be 8.
 		};
 
 		struct Element {
@@ -587,7 +587,7 @@ class RasterizerGLES1 : public Rasterizer {
 			const InstanceData *instance;
 			const Skeleton *skeleton;
 			union {
-				uint16_t lights[MAX_HW_LIGHTS];
+				uint16_t lights[MAX_LIGHTS];
 				uint64_t light_key;
 			};
 
