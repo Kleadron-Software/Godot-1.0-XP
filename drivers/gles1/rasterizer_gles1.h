@@ -677,7 +677,7 @@ class RasterizerGLES1 : public Rasterizer {
 
 		_FORCE_INLINE_ Element* add_element() {
 
-			if (element_count>MAX_ELEMENTS)
+			if (element_count>=MAX_ELEMENTS)
 				return NULL;
 			elements[element_count]=&_elements[element_count];
 			return elements[element_count++];

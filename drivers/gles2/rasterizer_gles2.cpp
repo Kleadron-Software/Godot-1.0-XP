@@ -4688,6 +4688,10 @@ void RasterizerGLES2::_add_geometry( const Geometry* p_geometry, const InstanceD
 			if (duplicate) {
 
 				ec = render_list->add_element();
+				
+				if (!ec)
+					return;
+				
 				memcpy(ec,e,sizeof(RenderList::Element));
 			} else {
 
@@ -4722,6 +4726,10 @@ void RasterizerGLES2::_add_geometry( const Geometry* p_geometry, const InstanceD
 			if (duplicate) {
 
 				ec = render_list->add_element();
+				
+				if (!ec)
+					return;
+				
 				memcpy(ec,e,sizeof(RenderList::Element));
 			} else {
 
