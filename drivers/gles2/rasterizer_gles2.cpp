@@ -4334,7 +4334,7 @@ void RasterizerGLES2::add_light( RID p_light_instance ) {
 
 		case VS::LIGHT_DIRECTIONAL: {
 
-			ERR_FAIL_COND( directional_light_count >= RenderList::MAX_LIGHTS);
+			//ERR_FAIL_COND( directional_light_count >= RenderList::MAX_LIGHTS);
 			directional_lights[directional_light_count++]=li;
 
 			if (li->base->shadow_enabled) {
