@@ -4354,7 +4354,7 @@ void RasterizerGLES1::_render_list_forward(RenderList *p_render_list,bool p_reve
 
 
 // todo: gl1 version
-void RasterizerGLES2::_draw_tex_bg() {
+void RasterizerGLES1::_draw_tex_bg() {
 	
 }
 
