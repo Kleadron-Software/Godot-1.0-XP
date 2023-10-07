@@ -3631,7 +3631,7 @@ void RasterizerGLES1::_setup_lights(const uint16_t * p_lights,int p_light_count)
 
 
 			glEnable(GL_LIGHT0 + i);
-			_setup_light(light_instances[p_lights[i]], i);
+			_setup_light(light_instances[p_lights[i-directional_light_count]], i);
 
 		} else {
 			glDisable(GL_LIGHT0 + i);
@@ -4256,7 +4256,9 @@ void RasterizerGLES1::_setup_shader_params(const Material *p_material) {
 void RasterizerGLES1::_render_list_forward(RenderList *p_render_list,bool p_reverse_cull) {
 
 	const Material *prev_material=NULL;
-	uint64_t prev_light_key=0;
+	 // needs to not be 0 since if there's one light it will get ignored.
+	 // But also not -1 since that marks unshaded.
+	uint64_t prev_light_key=-2;
 	const Skeleton *prev_skeleton=NULL;
 	const Geometry *prev_geometry=NULL;
 
@@ -4446,11 +4448,17 @@ void RasterizerGLES1::end_scene() {
 	}
 
 
+	// directional lights are global, and always get setup first here
+	for(int i=0;i<MAX_HW_LIGHTS;i++) {
 
-	for(int i=0;i<directional_light_count;i++) {
-
-		glEnable(GL_LIGHT0+i);
-		_setup_light(directional_lights[i],i);
+		if (i < directional_light_count) {
+			
+			glEnable(GL_LIGHT0+i);
+			_setup_light(directional_lights[i],i);
+		} else {
+			
+			glDisable(GL_LIGHT0+i);
+		}
 	}
 
 	opaque_render_list.sort_mat_light();
