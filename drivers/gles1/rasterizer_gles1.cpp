@@ -3126,6 +3126,9 @@ void RasterizerGLES1::_add_geometry( const Geometry* p_geometry, const InstanceD
 
 	RenderList::Element *e = render_list->add_element();
 
+	if (!e)
+		return;
+
 	e->geometry=p_geometry;
 //	e->geometry_cmp=p_geometry_cmp;
 	e->material=m;
@@ -4256,9 +4259,8 @@ void RasterizerGLES1::_setup_shader_params(const Material *p_material) {
 void RasterizerGLES1::_render_list_forward(RenderList *p_render_list,bool p_reverse_cull) {
 
 	const Material *prev_material=NULL;
-	 // needs to not be 0 since if there's one light it will get ignored.
-	 // But also not -1 since that marks unshaded.
-	uint64_t prev_light_key=-2;
+	uint64_t prev_light_key=0;
+	uint16_t prev_light_count=0;
 	const Skeleton *prev_skeleton=NULL;
 	const Geometry *prev_geometry=NULL;
 
@@ -4269,6 +4271,7 @@ void RasterizerGLES1::_render_list_forward(RenderList *p_render_list,bool p_reve
 		RenderList::Element *e = p_render_list->elements[i];
 		const Material *material = e->material;
 		uint64_t light_key = e->light_key;
+		uint16_t light_count = e->light_count;
 		const Skeleton *skeleton = e->skeleton;
 		const Geometry *geometry = e->geometry;
 
@@ -4290,7 +4293,7 @@ void RasterizerGLES1::_render_list_forward(RenderList *p_render_list,bool p_reve
 			_setup_geometry(geometry, material,e->skeleton,e->instance->morph_values.ptr());
 		};
 
-		if (i==0 || light_key!=prev_light_key)
+		if (i==0 || light_key!=prev_light_key || light_count!=prev_light_count)
 			_setup_lights(e->lights,e->light_count);
 
 		_set_cull(e->mirror,p_reverse_cull);
@@ -4345,6 +4348,7 @@ void RasterizerGLES1::_render_list_forward(RenderList *p_render_list,bool p_reve
 		prev_skeleton=skeleton;
 		prev_geometry=geometry;
 		prev_light_key=e->light_key;
+		prev_light_count=e->light_count;
 		prev_geometry_type=geometry->type;
 	}
 
