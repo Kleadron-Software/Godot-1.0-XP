@@ -2976,7 +2976,8 @@ void RasterizerGLES1::begin_scene(RID p_viewport_data,RID p_env,VS::ScenarioDebu
 	opaque_render_list.clear();
 	alpha_render_list.clear();
 	light_instance_count=0;
-	scene_fx = NULL; // p_env.is_valid() ? fx_owner.get(p_env) : NULL;
+	//scene_fx = NULL; // p_env.is_valid() ? fx_owner.get(p_env) : NULL;
+	current_env = p_env.is_valid() ? environment_owner.get(p_env) : NULL;
 	scene_pass++;
 	last_light_id=0;
 	directional_light_count=0;
@@ -3251,14 +3252,10 @@ void RasterizerGLES1::_set_cull(bool p_front,bool p_reverse_cull) {
 
 
 void RasterizerGLES1::_setup_fixed_material(const Geometry *p_geometry,const Material *p_material) {
-
+	
 	if (!shadow) {
 
-		///ambient @TODO offer global ambient group option
-
-		//GLenum side = use_shaders?GL_FRONT:GL_FRONT_AND_BACK;
 		GLenum side = GL_FRONT_AND_BACK;
-
 
 		///diffuse
 		Color diffuse_color=p_material->parameters[VS::FIXED_MATERIAL_PARAM_DIFFUSE];
@@ -3268,11 +3265,28 @@ void RasterizerGLES1::_setup_fixed_material(const Geometry *p_geometry,const Mat
 			  diffuse_color.b,
 			   diffuse_color.a
 		};
+		
+		///ambient @TODO offer global ambient group option
+		if (current_env && current_env->fx_enabled[VS::ENV_FX_AMBIENT_LIGHT]) {
+			Color ambcolor = current_env->fx_param[VS::ENV_FX_PARAM_AMBIENT_LIGHT_COLOR];
+			float ambnrg =  current_env->fx_param[VS::ENV_FX_PARAM_AMBIENT_LIGHT_ENERGY];
+			ambnrg *= 5; // multiply by arbitrarily but decisively picked number to make it match GLES2?
+			float ambient_color[4]={
+				ambcolor.r*ambnrg*diffuse_color.r,
+				ambcolor.g*ambnrg*diffuse_color.g,
+				ambcolor.b*ambnrg*diffuse_color.b,
+				1
+			};
+			glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,ambient_color);
+		} else {
+			float ambient_color[4]={0,0,0,1};
+			glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,ambient_color);
+		}
 
 		//color array overrides this
 		glColor4f( diffuse_rgba[0],diffuse_rgba[1],diffuse_rgba[2],diffuse_rgba[3]);
 		last_color=diffuse_color;
-		glMaterialfv(side,GL_AMBIENT,diffuse_rgba);
+		//glMaterialfv(side,GL_AMBIENT,diffuse_rgba); // why?
 		glMaterialfv(side,GL_DIFFUSE,diffuse_rgba);
 		//specular
 
@@ -3408,7 +3422,7 @@ void RasterizerGLES1::_setup_material(const Geometry *p_geometry,const Material 
 		}
 
 	}
-
+	
 	bool current_depth_write=p_material->depth_draw_mode!=VS::MATERIAL_DEPTH_DRAW_ALWAYS; //broken
 	bool current_depth_test=!p_material->flags[VS::MATERIAL_FLAG_ONTOP];
 
@@ -3636,7 +3650,7 @@ static const GLenum gl_client_states[] = {
 	0, // ARRAY_TANGENT
 	GL_COLOR_ARRAY,//GL_COLOR_ARRAY,
 	GL_TEXTURE_COORD_ARRAY, // ARRAY_TEX_UV
-	0,//GL_TEXTURE_COORD_ARRAY, // ARRAY_TEX_UV2
+	GL_TEXTURE_COORD_ARRAY, // ARRAY_TEX_UV2
 	0, // ARRAY_BONES
 	0, // ARRAY_WEIGHTS
 };
@@ -3648,7 +3662,7 @@ static const int gl_texcoord_index[VS::ARRAY_MAX-1] = {
 	-1, // ARRAY_TANGENT
 	-1,
 	0, // ARRAY_TEX_UV
-	-1,//1, // ARRAY_TEX_UV2
+	1,//1, // ARRAY_TEX_UV2
 	-1, // ARRAY_BONES
 	-1, // ARRAY_WEIGHTS
 };
@@ -3921,8 +3935,9 @@ Error RasterizerGLES1::_setup_geometry(const Geometry *p_geometry, const Materia
 
 //				if (!gl_texcoord_shader[i])
 //					continue;
-
-				if (ad.size==0 || i==VS::ARRAY_BONES || i==VS::ARRAY_WEIGHTS || gl_client_states[i]==0 ) {
+				bool skip_color_array = i == VS::ARRAY_COLOR && !p_material->fixed_flags[VisualServer::FIXED_MATERIAL_FLAG_USE_COLOR_ARRAY];
+	
+				if (ad.size==0 || i==VS::ARRAY_BONES || i==VS::ARRAY_WEIGHTS || skip_color_array || gl_client_states[i]==0 ) {
 
 					if (gl_texcoord_index[i] != -1) {
 						glClientActiveTexture(GL_TEXTURE0+gl_texcoord_index[i]);
@@ -4336,6 +4351,11 @@ void RasterizerGLES1::_render_list_forward(RenderList *p_render_list,bool p_reve
 };
 
 
+// todo: gl1 version
+void RasterizerGLES2::_draw_tex_bg() {
+	
+}
+
 
 void RasterizerGLES1::end_scene() {
 
@@ -4351,7 +4371,7 @@ void RasterizerGLES1::end_scene() {
 	glEnable(GL_SCISSOR_TEST);
 	_glClearDepth(1.0);
 
-	if (scene_fx && scene_fx->skybox_active) {
+	/*if (scene_fx && scene_fx->skybox_active) {
 
 		//skybox
 	} else if (scene_fx && scene_fx->bgcolor_active) {
@@ -4363,7 +4383,50 @@ void RasterizerGLES1::end_scene() {
 		glClearColor(0.3,0.3,0.3,1.0);
 	}
 
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);*/
+	
+	bool draw_tex_background=false;
+
+	if (current_env) {
+
+		switch(current_env->bg_mode) {
+
+			case VS::ENV_BG_KEEP: {
+				//copy from framebuffer if framebuffer
+				glClear(GL_DEPTH_BUFFER_BIT);
+			} break;
+			case VS::ENV_BG_DEFAULT_COLOR:
+			case VS::ENV_BG_COLOR: {
+
+				Color bgcolor;
+				if (current_env->bg_mode==VS::ENV_BG_COLOR)
+					bgcolor = current_env->bg_param[VS::ENV_BG_PARAM_COLOR];
+				else
+					bgcolor = Globals::get_singleton()->get("render/default_clear_color");
+				//bgcolor = _convert_color(bgcolor);
+				float a = 1.0;
+				glClearColor(bgcolor.r,bgcolor.g,bgcolor.b,a);
+				_glClearDepth(1.0);
+				glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+			} break;
+			case VS::ENV_BG_TEXTURE:
+			case VS::ENV_BG_CUBEMAP:
+			case VS::ENV_BG_TEXTURE_RGBE:
+			case VS::ENV_BG_CUBEMAP_RGBE: {
+
+
+				glClear(GL_DEPTH_BUFFER_BIT);
+				draw_tex_background=true;
+			} break;
+
+		}
+	} else {
+
+		Color c = Color(0.3,0.3,0.3);
+		glClearColor(c.r,c.g,c.b,0.0);
+		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	}
 
 	glDisable(GL_SCISSOR_TEST);
 
@@ -4424,7 +4487,14 @@ void RasterizerGLES1::end_scene() {
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
 	_render_list_forward(&opaque_render_list);
+	
+	if (draw_tex_background) {
 
+		//most 3D vendors recommend drawing a texture bg or skybox here,
+		//after opaque geometry has been drawn
+		//so the zbuffer can get rid of most pixels
+		_draw_tex_bg();
+	}
 
 	alpha_render_list.sort_z();
 	glEnable(GL_BLEND);

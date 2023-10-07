@@ -854,13 +854,16 @@ class RasterizerGLES1 : public Rasterizer {
 
 	bool cull_front;
 	_FORCE_INLINE_ void _set_cull(bool p_front,bool p_reverse_cull=false);
-
+	
+	void _draw_tex_bg();
+	
 	Size2 window_size;
 	VS::ViewportRect viewport;
 	double last_time;
 	double time_delta;
 	uint64_t frame;
 	uint64_t scene_pass;
+	Environment *current_env;
 
 	//void _draw_primitive(int p_points, const Vector3 *p_vertices, const Vector3 *p_normals, const Color* p_colors, const Vector3 *p_uvs,const Plane *p_tangents=NULL,int p_instanced=1);
 	//void _draw_textured_quad(const Rect2& p_rect, const Rect2& p_src_region, const Size2& p_tex_size,bool p_h_flip=false, bool p_v_flip=false );
