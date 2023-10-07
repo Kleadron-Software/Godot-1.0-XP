@@ -4432,7 +4432,7 @@ void RasterizerGLES1::end_scene() {
 
 	glDisable(GL_SCISSOR_TEST);
 
-	if (scene_fx && scene_fx->fog_active) {
+	//if (scene_fx && scene_fx->fog_active) {
 
 		/*
 		glEnable(GL_FOG);
@@ -4445,6 +4445,27 @@ void RasterizerGLES1::end_scene() {
 
 		material_shader.set_conditional( MaterialShaderGLES1::USE_FOG,true);
 		*/
+	//}
+	
+	// fog!
+	if (current_env && current_env->fx_enabled[VS::ENV_FX_FOG]) {
+
+		Color col_begin = current_env->fx_param[VS::ENV_FX_PARAM_FOG_BEGIN_COLOR];
+		Color col_end = current_env->fx_param[VS::ENV_FX_PARAM_FOG_END_COLOR];
+		float from = current_env->fx_param[VS::ENV_FX_PARAM_FOG_BEGIN];
+		float zf = camera_z_far;
+		float curve = 1.0f - (float)current_env->fx_param[VS::ENV_FX_PARAM_FOG_ATTENUATION];
+		//material_shader.set_uniform(MaterialShaderGLES2::FOG_PARAMS,Vector3(from,zf,curve));
+		//material_shader.set_uniform(MaterialShaderGLES2::FOG_COLOR_BEGIN,Vector3(col_begin.r,col_begin.g,col_begin.b));
+		//material_shader.set_uniform(MaterialShaderGLES2::FOG_COLOR_END,Vector3(col_end.r,col_end.g,col_end.b));
+		
+		glEnable(GL_FOG);
+		glFogf(GL_FOG_MODE,GL_EXP2);
+		glFogf(GL_FOG_DENSITY,curve);
+		glFogf(GL_FOG_START,from);
+		glFogf(GL_FOG_END,zf);
+		glFogfv(GL_FOG_COLOR,col_end.components);
+		//glLightfv(GL_LIGHT5,GL_DIFFUSE,col_begin.components);
 	}
 
 
@@ -4497,11 +4518,17 @@ void RasterizerGLES1::end_scene() {
 	_render_list_forward(&opaque_render_list);
 	
 	if (draw_tex_background) {
-
+		
+		glDisable(GL_FOG); // disable fog if the background is being drawn
 		//most 3D vendors recommend drawing a texture bg or skybox here,
 		//after opaque geometry has been drawn
 		//so the zbuffer can get rid of most pixels
 		_draw_tex_bg();
+	}
+	
+	if (current_env && current_env->fx_enabled[VS::ENV_FX_FOG]) {
+		
+		glEnable(GL_FOG);	// re-enable fog
 	}
 
 	alpha_render_list.sort_z();
@@ -4511,7 +4538,8 @@ void RasterizerGLES1::end_scene() {
 
 	glPopMatrix();
 
-
+	// disable fog again
+	glDisable(GL_FOG);
 //	material_shader.set_conditional( MaterialShaderGLES1::USE_FOG,false);
 
 	_debug_shadows();
@@ -4783,6 +4811,9 @@ void RasterizerGLES1::reset_state() {
 	texcoord_mode=0;
 	glDisable(GL_TEXTURE_GEN_S);
 	glDisable(GL_TEXTURE_GEN_T);
+	
+	// turn off fog
+	glDisable(GL_FOG);
 }
 
 _FORCE_INLINE_ static void _set_glcoloro(const Color& p_color,const float p_opac) {
