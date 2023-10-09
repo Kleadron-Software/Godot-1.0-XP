@@ -31,18 +31,14 @@ void baked_light_baker_add_64i(int64_t *dst,int64_t value) {
 
 #elif defined(WINDOWS_ENABLED)
 
-#include "windows.h"
+//#include "windows.h"
 
-inline LONGLONG _InterlockedCompareExchange64(LONGLONG volatile* Destination, LONGLONG Exchange, LONGLONG Comperand)
-{
-	__asm {
-		mov esi, [Destination]
-		mov ebx, dword ptr [Exchange]
-		mov ecx, dword ptr [Exchange + 4]
-		mov eax, dword ptr [Comperand]
-		mov edx, dword ptr [Comperand + 4]
-		lock cmpxchg8b [esi]
+inline int64_t __InterlockedCompareExchange64(int64_t volatile* Destination, int64_t Exchange, int64_t Comperand) {
+	int64_t dest_last = *Destination;
+	if (dest_last == Comperand) {
+		*Destination = Exchange;
 	}
+	return dest_last;
 }
 
 void baked_light_baker_add_64f(double *dst,double value) {
@@ -58,7 +54,7 @@ void baked_light_baker_add_64f(double *dst,double value) {
 		int64_t from = swapy.i;
 		swapy.f+=value;
 		int64_t to=swapy.i;
-		int64_t result = _InterlockedCompareExchange64((int64_t*)dst,to,from);
+		int64_t result = __InterlockedCompareExchange64((int64_t*)dst,to,from);
 		if (result==from)
 			break;
 	}
@@ -70,7 +66,7 @@ void baked_light_baker_add_64i(int64_t *dst,int64_t value) {
 	while(true) {
 		int64_t from = *dst;
 		int64_t to = from+value;
-		int64_t result = _InterlockedCompareExchange64(dst,to,from);
+		int64_t result = __InterlockedCompareExchange64(dst,to,from);
 		if (result==from)
 			break;
 	}
