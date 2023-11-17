@@ -67,6 +67,11 @@ platform/android/libs/play_licensing/gen/*
 *.user
 *.sln.docstates
 
+!bin/
+bin/*.exe
+bin/*.ilk
+bin/*.pdb
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -74,7 +79,7 @@ platform/android/libs/play_licensing/gen/*
 x64/
 build/
 bld/
-[Bb]in/
+#[Bb]in/
 [Oo]bj/
 
 # MSTest test Results
