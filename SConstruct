@@ -115,6 +115,7 @@ opts.Add('pvr','PVR (PowerVR) Texture loader support (yes/no)','yes')
 opts.Add('builtin_zlib','Use built-in zlib (yes/no)','yes')
 opts.Add('openssl','Use OpenSSL (yes/no/builtin)','no')
 opts.Add('musepack','Musepack Audio (yes/no)','yes')
+opts.Add('opus', 'Opus Audio (yes/no)','yes')
 opts.Add("CXX", "Compiler");
 opts.Add("CCFLAGS", "Custom flags for the C++ compiler");
 opts.Add("CFLAGS", "Custom flags for the C compiler");
@@ -281,6 +282,9 @@ if selected_platform in platform_list:
 			env.Append(CPPFLAGS=['-DOPENSSL_ENABLED']);
 			if (env['openssl']=="builtin"):
 				env.Append(CPPPATH=['#drivers/builtin_openssl2'])
+
+	if (env['opus']=='yes'):
+		env.Append(CPPFLAGS=['-DOPUS_ENABLED']);
 
 	if (env["builtin_zlib"]=='yes'):
 		env.Append(CPPPATH=['#drivers/builtin_zlib/zlib'])
