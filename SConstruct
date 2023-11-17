@@ -94,7 +94,7 @@ if profile:
 
 opts=Variables(customs, ARGUMENTS)
 opts.Add('target', 'Compile Target (debug/release_debug/release).', "debug")
-opts.Add('bits', 'Compile Target Bits (default/32/64).', "default")
+opts.Add('bits', 'Compile Target Bits (default/32/64).', "32")
 opts.Add('platform','Platform: '+str(platform_list)+'.',"")
 opts.Add('p','Platform (same as platform=).',"")
 opts.Add('tools','Build Tools (Including Editor): (yes/no)','yes')
