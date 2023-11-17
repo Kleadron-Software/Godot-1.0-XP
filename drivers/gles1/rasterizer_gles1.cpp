@@ -4901,8 +4901,15 @@ void RasterizerGLES1::canvas_set_clip(bool p_clip, const Rect2& p_rect) {
 	//	glScissor(viewport.x+p_rect.pos.x,viewport.y+ (viewport.height-(p_rect.pos.y+p_rect.size.height)),
 		//p_rect.size.width,p_rect.size.height);
 		//glScissor(p_rect.pos.x,(viewport.height-(p_rect.pos.y+p_rect.size.height)),p_rect.size.width,p_rect.size.height);
-		glScissor(viewport.x+p_rect.pos.x,viewport.y+ (window_size.y-(p_rect.pos.y+p_rect.size.height)),
-		p_rect.size.width,p_rect.size.height);
+		// glScissor(viewport.x+p_rect.pos.x,viewport.y+ (window_size.y-(p_rect.pos.y+p_rect.size.height)),
+		// p_rect.size.width,p_rect.size.height);
+
+		int x = p_rect.pos.x;
+		int y = window_size.height - (p_rect.pos.y + p_rect.size.y);
+		int w = p_rect.size.x;
+		int h = p_rect.size.y;
+
+		glScissor(x, y, w, h);
 	} else {
 
 		glDisable(GL_SCISSOR_TEST);

@@ -54,6 +54,10 @@
 #include "mpc/audio_stream_mpc.h"
 #endif
 
+#ifdef OPUS_ENABLED
+#include "opus/audio_stream_opus.h"
+#endif
+
 #ifdef PNG_ENABLED
 static ImageLoaderPNG *image_loader_png=NULL;
 static ResourceSaverPNG *resource_saver_png=NULL;
@@ -96,6 +100,10 @@ static ResourceFormatLoaderVideoStreamTheoraplayer* theoraplayer_stream_loader =
 
 #ifdef MUSEPACK_ENABLED
 static ResourceFormatLoaderAudioStreamMPC * mpc_stream_loader=NULL;
+#endif
+
+#ifdef OPUS_ENABLED
+static ResourceFormatLoaderAudioStreamOpus * opus_stream_loader=NULL;
 #endif
 
 #ifdef OPENSSL_ENABLED
@@ -199,6 +207,14 @@ void register_driver_types() {
 
 #endif
 
+#ifdef OPUS_ENABLED
+
+	opus_stream_loader = memnew( ResourceFormatLoaderAudioStreamOpus );
+	ResourceLoader::add_resource_format_loader(opus_stream_loader);
+	ObjectTypeDB::register_type<AudioStreamOpus>();
+
+#endif
+
 #ifdef OPENSSL_ENABLED
 
 	register_openssl();
@@ -248,6 +264,11 @@ void unregister_driver_types() {
 #ifdef MUSEPACK_ENABLED
 
 	memdelete (mpc_stream_loader);
+#endif
+
+#ifdef OPUS_ENABLED
+
+	memdelete (opus_stream_loader);
 #endif
 
 #ifdef DDS_ENABLED
