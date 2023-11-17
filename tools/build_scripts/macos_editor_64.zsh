@@ -3,7 +3,7 @@ read thread_count
 
 cd ../../
 
-python2 tools/scons/scons.py target=release_debug tools=yes musepack=yes theora=yes opus=yes platform=osx bits=64 optimized=speed -j$thread_count
+python2 tools/scons/scons.py target=release_debug tools=yes musepack=yes theora=no opus=yes platform=osx bits=64 optimized=speed -j$thread_count
 
 rm -rf "bin/godot_xp.app"
 cp -r "tools/Godot.app" ./"bin/godot_xp.app"
