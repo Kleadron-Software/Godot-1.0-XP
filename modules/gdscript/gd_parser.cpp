@@ -2114,6 +2114,7 @@ void GDParser::_parse_class(ClassNode *p_class) {
 							return;
 						}
 						current_export.type=type;
+						current_export.usage|=PROPERTY_USAGE_SCRIPT_VARIABLE;
 						tokenizer->advance();
 						if (tokenizer->get_token()==GDTokenizer::TK_COMMA) {
 							// hint expected next!
@@ -2358,6 +2359,8 @@ void GDParser::_parse_class(ClassNode *p_class) {
 
 						current_export.type=Variant::OBJECT;
 						current_export.hint=PROPERTY_HINT_RESOURCE_TYPE;
+						current_export.usage|=PROPERTY_USAGE_SCRIPT_VARIABLE;
+
 						current_export.hint_string=identifier;
 
 						tokenizer->advance();
@@ -2441,6 +2444,7 @@ void GDParser::_parse_class(ClassNode *p_class) {
 								return;
 							}
 							member._export.type=cn->value.get_type();
+							member._export.usage|=PROPERTY_USAGE_SCRIPT_VARIABLE;
 						}
 					}
 #ifdef TOOLS_ENABLED

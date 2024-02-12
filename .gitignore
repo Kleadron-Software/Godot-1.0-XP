@@ -67,10 +67,9 @@ platform/android/libs/play_licensing/gen/*
 *.user
 *.sln.docstates
 
-!bin/
-bin/*.exe
-bin/*.ilk
-bin/*.pdb
+!bin/tests
+!bin/SCsub
+bin/
 
 # Build results
 [Dd]ebug/
