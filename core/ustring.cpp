@@ -591,28 +591,79 @@ Vector<String> String::split_spaces() const {
 
 }
 
-Vector<String> String::split(const String &p_splitter,bool p_allow_empty) const {
+
+Vector<String> String::split(const String &p_splitter, bool p_allow_empty, int p_maxsplit) const {
 
 	Vector<String> ret;
-	int from=0;
+	int from = 0;
 	int len = length();
 
-	while(true) {
+	while (true) {
+		int end = find(p_splitter, from);
+		if (end < 0) {
+			end = len;
+		}
+		if (p_allow_empty || (end > from)) {
+			if (p_maxsplit <= 0) {
+				ret.push_back(substr(from, end - from));
+			} else {
+				// Put rest of the string and leave cycle.
+				if (p_maxsplit == ret.size()) {
+					ret.push_back(substr(from, len));
+					break;
+				}
 
-		int end=find(p_splitter,from);
-		if (end<0)
-			end=len;
-		if (p_allow_empty || (end>from))
-			ret.push_back(substr(from,end-from));
+				// Otherwise, push items until positive limit is reached.
+				ret.push_back(substr(from, end - from));
+			}
+		}
 
-		if (end==len)
+		if (end == len) {
 			break;
+		}
 
-		from = end+p_splitter.length();
+		from = end + p_splitter.length();
 	}
 
 	return ret;
 }
+
+
+Vector<String> String::rsplit(const String &p_splitter, bool p_allow_empty, int p_maxsplit) const {
+
+	Vector<String> ret;
+	int len = length();
+	int remaining_len = len;
+
+	while (true) {
+		if (remaining_len < p_splitter.length() || (p_maxsplit > 0 && p_maxsplit == ret.size())) {
+			// no room for another splitter or hit max splits, push what's left and we're done
+			if (p_allow_empty || remaining_len > 0) {
+				ret.push_back(substr(0, remaining_len));
+			}
+			break;
+		}
+
+		int left_edge = rfind(p_splitter, remaining_len - p_splitter.length());
+
+		if (left_edge < 0) {
+			// no more splitters, we're done
+			ret.push_back(substr(0, remaining_len));
+			break;
+		}
+
+		int substr_start = left_edge + p_splitter.length();
+		if (p_allow_empty || substr_start < remaining_len) {
+			ret.push_back(substr(substr_start, remaining_len - substr_start));
+		}
+
+		remaining_len = left_edge;
+	}
+
+	ret.invert();
+	return ret;
+}
+
 
 Vector<float> String::split_floats(const String &p_splitter,bool p_allow_empty) const {
 
@@ -721,6 +772,18 @@ Vector<int> String::split_ints_mk(const Vector<String> &p_splitters,bool p_allow
 	return ret;
 
 
+}
+
+
+String String::join(const Vector<String> &parts) const {
+	String ret;
+	for (int i = 0; i < parts.size(); ++i) {
+		if (i > 0) {
+			ret += *this;
+		}
+		ret += parts[i];
+	}
+	return ret;
 }
 
 

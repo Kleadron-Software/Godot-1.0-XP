@@ -102,13 +102,16 @@ struct _VariantCall {
 				}
 
 #endif
-				ERR_FAIL_COND(p_argcount>VARIANT_ARG_MAX);
+				ERR_FAIL_COND(p_argcount > VARIANT_ARG_MAX);
 				const Variant *newargs[VARIANT_ARG_MAX];
-				for(int i=0;i<p_argcount;i++)
-					newargs[i]=p_args[i];
-				int defargcount=def_argcount;
-				for(int i=p_argcount;i<arg_count;i++)
-					newargs[i]=&default_args[defargcount-(i-p_argcount)-1]; //default arguments
+				for (int i = 0; i < p_argcount; i++) {
+					newargs[i] = p_args[i];
+				}
+				// fill in any remaining parameters with defaults
+				int first_default_arg = arg_count - def_argcount;
+				for (int i = p_argcount; i < arg_count; i++) {
+					newargs[i] = &default_args[i - first_default_arg];
+				}
 #ifdef DEBUG_ENABLED
 				if (!verify_arguments(newargs,r_error))
 					return;
@@ -250,8 +253,10 @@ static void _call_##m_type##_##m_method(Variant& r_ret,Variant& p_self,const Var
 	VCALL_LOCALMEM2R(String,replacen);
 	VCALL_LOCALMEM2R(String,insert);
 	VCALL_LOCALMEM0R(String,capitalize);
-	VCALL_LOCALMEM2R(String,split);
+	VCALL_LOCALMEM3R(String,split);
+	VCALL_LOCALMEM3R(String,rsplit);
 	VCALL_LOCALMEM2R(String,split_floats);
+	VCALL_LOCALMEM1R(String,join);
 	VCALL_LOCALMEM0R(String,to_upper);
 	VCALL_LOCALMEM0R(String,to_lower);
 	VCALL_LOCALMEM1R(String,left);
@@ -1205,8 +1210,10 @@ _VariantCall::addfunc(Variant::m_vtype,Variant::m_ret,_SCS(#m_method),VCALL(m_cl
 	ADDFUNC2(STRING,STRING,String,replacen,STRING,"what",STRING,"forwhat",varray());
 	ADDFUNC2(STRING,STRING,String,insert,INT,"pos",STRING,"what",varray());
 	ADDFUNC0(STRING,STRING,String,capitalize,varray());
-	ADDFUNC2(STRING,STRING_ARRAY,String,split,STRING,"divisor",BOOL,"allow_empty",varray(true));
+	ADDFUNC3(STRING, STRING_ARRAY, String, split, STRING, "divisor", BOOL, "allow_empty", INT, "maxsplit", varray(true, 0));
+	ADDFUNC3(STRING, STRING_ARRAY, String, rsplit, STRING, "divisor", BOOL, "allow_empty", INT, "maxsplit", varray(true, 0));
 	ADDFUNC2(STRING,REAL_ARRAY,String,split_floats,STRING,"divisor",BOOL,"allow_empty",varray(true));
+	ADDFUNC1(STRING, STRING, String, join, STRING_ARRAY, "parts", varray());
 	ADDFUNC0(STRING,STRING,String,to_upper,varray());
 
 	ADDFUNC0(STRING,STRING,String,to_lower,varray());

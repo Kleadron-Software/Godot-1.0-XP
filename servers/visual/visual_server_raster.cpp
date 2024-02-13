@@ -1402,6 +1402,17 @@ void VisualServerRaster::camera_set_orthogonal(RID p_camera,float p_size, float 
 	camera->zfar=p_z_far;
 }
 
+void VisualServerRaster::camera_set_frustum(RID p_camera,float p_size, Vector2 p_offset, float p_z_near, float p_z_far) {
+	VS_CHANGED;
+	Camera *camera = camera_owner.get( p_camera );
+	ERR_FAIL_COND(!camera);
+	camera->type=Camera::FRUSTUM;
+	camera->size=p_size;
+	camera->offset=p_offset;
+	camera->znear=p_z_near;
+	camera->zfar=p_z_far;
+}
+
 void VisualServerRaster::camera_set_transform(RID p_camera,const Transform& p_transform) {
 	VS_CHANGED;
 	Camera *camera = camera_owner.get( p_camera );
@@ -5823,7 +5834,20 @@ void VisualServerRaster::_render_camera(Viewport *p_viewport,Camera *p_camera, S
 
 			);
 				
-		} break;		
+		} break;
+		case Camera::FRUSTUM: {
+
+			camera_matrix.set_frustum(
+				p_camera->size,
+				viewport_rect.width / (float)viewport_rect.height,
+				p_camera->offset,
+				p_camera->znear,
+				p_camera->zfar,
+				p_camera->vaspect
+
+			);
+
+		} break;
 	}
 
 

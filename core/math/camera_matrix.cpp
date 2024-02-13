@@ -120,20 +120,63 @@ void CameraMatrix::set_orthogonal(float p_size, float p_aspect, float p_znear, f
 
 
 
+// void CameraMatrix::set_frustum(float p_left, float p_right, float p_bottom, float p_top, float p_near, float p_far) {
+
+// 	///@TODO, give a check to this. I'm not sure if it's working.
+// 	set_identity();
+
+// 	matrix[0][0]=(2*p_near) / (p_right-p_left);
+// 	matrix[0][2]=(p_right+p_left) / (p_right-p_left);
+// 	matrix[1][1]=(2*p_near) / (p_top-p_bottom);
+// 	matrix[1][2]=(p_top+p_bottom) / (p_top-p_bottom);
+// 	matrix[2][2]=-(p_far+p_near) / ( p_far-p_near);
+// 	matrix[2][3]=-(2*p_far*p_near) / (p_far-p_near);
+// 	matrix[3][2]=-1;
+// 	matrix[3][3]=0;
+
+// }
+
+
 void CameraMatrix::set_frustum(float p_left, float p_right, float p_bottom, float p_top, float p_near, float p_far) {
 
-	///@TODO, give a check to this. I'm not sure if it's working.
-	set_identity();
+	ERR_FAIL_COND(p_right <= p_left);
+	ERR_FAIL_COND(p_top <= p_bottom);
+	ERR_FAIL_COND(p_far <= p_near);
 
-	matrix[0][0]=(2*p_near) / (p_right-p_left);
-	matrix[0][2]=(p_right+p_left) / (p_right-p_left);
-	matrix[1][1]=(2*p_near) / (p_top-p_bottom);
-	matrix[1][2]=(p_top+p_bottom) / (p_top-p_bottom);
-	matrix[2][2]=-(p_far+p_near) / ( p_far-p_near);
-	matrix[2][3]=-(2*p_far*p_near) / (p_far-p_near);
-	matrix[3][2]=-1;
-	matrix[3][3]=0;
+	float *te = &matrix[0][0];
+	float x = 2 * p_near / (p_right - p_left);
+	float y = 2 * p_near / (p_top - p_bottom);
 
+	float a = (p_right + p_left) / (p_right - p_left);
+	float b = (p_top + p_bottom) / (p_top - p_bottom);
+	float c = -(p_far + p_near) / (p_far - p_near);
+	float d = -2 * p_far * p_near / (p_far - p_near);
+
+	te[0] = x;
+	te[1] = 0;
+	te[2] = 0;
+	te[3] = 0;
+	te[4] = 0;
+	te[5] = y;
+	te[6] = 0;
+	te[7] = 0;
+	te[8] = a;
+	te[9] = b;
+	te[10] = c;
+	te[11] = -1;
+	te[12] = 0;
+	te[13] = 0;
+	te[14] = d;
+	te[15] = 0;
+}
+
+
+void CameraMatrix::set_frustum(float p_size, float p_aspect, Vector2 p_offset, float p_near, float p_far, bool p_flip_fov) {
+	if (!p_flip_fov) {
+		p_size *= p_aspect;
+	}
+
+	set_frustum(-p_size / 2 + p_offset.x, +p_size / 2 + p_offset.x, -p_size / p_aspect / 2 + p_offset.y, +p_size / p_aspect / 2 + p_offset.y, p_near, p_far);
 }
 
 

@@ -43,7 +43,8 @@ public:
 	enum Projection {
 		
 		PROJECTION_PERSPECTIVE,
-		PROJECTION_ORTHOGONAL
+		PROJECTION_ORTHOGONAL,
+		PROJECTION_FRUSTUM,
 	};
 
 	enum KeepAspect {
@@ -60,6 +61,7 @@ private:
 	
 	float fov;
 	float size;
+	Vector2 frustum_offset;
 	float near,far;
 	KeepAspect keep_aspect;
 	
@@ -105,6 +107,7 @@ public:
 
 	void set_perspective(float p_fovy_degrees, float p_z_near, float p_z_far);
 	void set_orthogonal(float p_size, float p_z_near, float p_z_far);
+	void set_frustum(float p_size, Vector2 p_offset, float p_z_near, float p_z_far);
 	
 	void make_current();
 	void clear_current();
@@ -116,6 +119,8 @@ public:
 	float get_size() const;
 	float get_zfar() const;
 	float get_znear() const;
+	Vector2 get_frustum_offset() const;
+
 	Projection get_projection() const;
 
 	virtual Transform get_camera_transform() const;
