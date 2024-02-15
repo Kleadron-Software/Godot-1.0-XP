@@ -35,6 +35,7 @@
 #include "io/packet_peer.h"
 #include "globals.h"
 #include "object_type_db.h"
+#include "math/expression.h"
 #include "geometry.h"
 #include "bind/core_bind.h"
 #include "core_string_names.h"
@@ -142,6 +143,8 @@ void register_core_types() {
 
 	ObjectTypeDB::register_type<PackedDataContainer>();
 	ObjectTypeDB::register_virtual_type<PackedDataContainerRef>();
+
+	ObjectTypeDB::register_type<Expression>();
 
 	ip = IP::create();
 

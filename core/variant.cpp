@@ -456,6 +456,25 @@ bool Variant::operator==(const Variant& p_variant) const {
 
 }
 
+bool Variant::operator!=(const Variant& p_variant) const {
+
+	if (type!=p_variant.type)
+		return true;
+	bool v;
+	Variant r;
+	evaluate(OP_NOT_EQUAL,*this,p_variant,r,v);
+	return r;
+}
+
+bool Variant::operator<(const Variant& p_variant) const {
+	if (type!=p_variant.type) //if types differ, then order by type first
+		return type<p_variant.type;
+	bool v;
+	Variant r;
+	evaluate(OP_LESS,*this,p_variant,r,v);
+	return r;
+}
+
 bool Variant::is_zero() const {
 
 	switch( type ) {
