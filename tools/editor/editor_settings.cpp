@@ -607,8 +607,17 @@ void EditorSettings::set_plugin_enabled(const String& p_plugin, bool p_enabled) 
 
 	if (p_enabled) {
 
+		// For the sake of easier development and VCS, the plugin system should look within the project for the script.
+		// This style is not recommended for distribution, but could help with game-specific tools.
+		String ppath = plugins[p_plugin].script;
 
-		String ppath = get_settings_path().plus_file("plugins/"+p_plugin+"/"+plugins[p_plugin].script);
+		FileAccess *f = FileAccess::create(FileAccess::ACCESS_RESOURCES);
+		bool script_exists_within_project = f->file_exists(ppath);
+		memdelete(f);
+
+		if (!script_exists_within_project) {
+			ppath = get_settings_path().plus_file("plugins/" + p_plugin + "/" + ppath);
+		}
 		EditorPlugin *ep=_load_plugin_editor(ppath);
 		if (!ep)
 			return;

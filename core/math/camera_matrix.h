@@ -30,6 +30,7 @@
 #define CAMERA_MATRIX_H
 
 #include "transform.h"
+#include "math_2d.h"
 /**
 	@author Juan Linietsky <reduzio@gmail.com>
 */
@@ -57,6 +58,7 @@ struct CameraMatrix {
 	void set_orthogonal(float p_left, float p_right, float p_bottom, float p_top,  float p_znear, float p_zfar);
 	void set_orthogonal(float p_size, float p_aspect, float p_znear, float p_zfar,bool p_flip_fov=false);
 	void set_frustum(float p_left, float p_right, float p_bottom, float p_top, float p_near, float p_far);
+	void set_frustum(float p_size, float p_aspect, Vector2 p_offset, float p_near, float p_far, bool p_flip_fov);
 
 	static float get_fovy(float p_fovx,float p_aspect) {
 

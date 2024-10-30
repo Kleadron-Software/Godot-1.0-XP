@@ -452,6 +452,7 @@ void VisualServer::_bind_methods() {
 	ObjectTypeDB::bind_method(_MD("camera_create"),&VisualServer::camera_create);
 	ObjectTypeDB::bind_method(_MD("camera_set_perspective"),&VisualServer::camera_set_perspective);
 	ObjectTypeDB::bind_method(_MD("camera_set_orthogonal"),&VisualServer::_camera_set_orthogonal);
+	ObjectTypeDB::bind_method(_MD("camera_set_frustum"),&VisualServer::camera_set_frustum);
 	ObjectTypeDB::bind_method(_MD("camera_set_transform"),&VisualServer::camera_set_transform);
 
 

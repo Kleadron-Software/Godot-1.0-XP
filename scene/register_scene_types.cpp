@@ -158,7 +158,8 @@
 
 #include "scene/resources/sample_library.h"
 #include "scene/resources/audio_stream.h"
-#include "scene/resources/gibberish_stream.h"
+// Remove gibberish!
+// #include "scene/resources/gibberish_stream.h"
 #include "scene/resources/bit_mask.h"
 #include "scene/scene_string_names.h"
 
@@ -544,7 +545,8 @@ void register_scene_types() {
 	ObjectTypeDB::register_type<Sample>();
 	ObjectTypeDB::register_type<SampleLibrary>();
 	ObjectTypeDB::register_virtual_type<AudioStream>();
-	ObjectTypeDB::register_type<AudioStreamGibberish>();
+	// Remove gibberish!
+//	ObjectTypeDB::register_type<AudioStreamGibberish>();
 	ObjectTypeDB::register_virtual_type<VideoStream>();
 
 	OS::get_singleton()->yield(); //may take time to init

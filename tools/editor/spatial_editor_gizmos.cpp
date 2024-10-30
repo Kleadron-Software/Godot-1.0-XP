@@ -1148,6 +1148,26 @@ void CameraSpatialGizmo::redraw(){
 			ADD_TRIANGLE( tup, right+up+back, -right+up+back );
 
 		} break;
+		case Camera::PROJECTION_FRUSTUM: {
+
+			float hsize = camera->get_size() / 2.0;
+
+			Vector3 side = Vector3(hsize, 0, -camera->get_znear()).normalized();
+			Vector3 nside = side;
+			nside.x = -nside.x;
+			Vector3 up = Vector3(0, side.x, 0);
+			Vector3 offset = Vector3(camera->get_frustum_offset().x, camera->get_frustum_offset().y, 0.0);
+
+			ADD_TRIANGLE(Vector3(), side + up + offset, side - up + offset);
+			ADD_TRIANGLE(Vector3(), nside + up + offset, nside - up + offset);
+			ADD_TRIANGLE(Vector3(), side + up + offset, nside + up + offset);
+			ADD_TRIANGLE(Vector3(), side - up + offset, nside - up + offset);
+
+			side.x *= 0.25;
+			nside.x *= 0.25;
+			Vector3 tup(0, up.y * 3 / 2, side.z);
+			ADD_TRIANGLE(tup + offset, side + up + offset, nside + up + offset);
+		} break;
 
 	}
 

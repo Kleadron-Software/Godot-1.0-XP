@@ -523,7 +523,7 @@ int GDCompiler::_parse_expression(CodeGen& codegen,const GDParser::Node *p_expre
 						int ret = _parse_expression(codegen,on->arguments[i],slevel);
 						if (ret<0)
 							return ret;
-						if (ret&GDFunction::ADDR_TYPE_STACK<<GDFunction::ADDR_BITS) {
+						if (ret&(GDFunction::ADDR_TYPE_STACK<<GDFunction::ADDR_BITS)) {
 							slevel++;
 							codegen.alloc_stack(slevel);
 						}
@@ -1509,6 +1509,9 @@ Error GDCompiler::_parse_class(GDScript *p_script,GDScript *p_owner,const GDPars
 				p_script->member_default_values[name]=p_class->variables[i].default_value;
 			}
 #endif
+		} else {
+
+			p_script->member_info[name] = PropertyInfo(Variant::NIL, name, PROPERTY_HINT_NONE, "", PROPERTY_USAGE_SCRIPT_VARIABLE);
 		}
 
 		//int new_idx = p_script->member_indices.size();
