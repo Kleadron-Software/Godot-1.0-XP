@@ -1,3 +1,6 @@
+# Superceeded by [Godot 2 XP](https://github.com/Kleadron-Software/Godot-2-XP)
+Godot 1.0 has zero benefits over its successor, so I have no plans to continue work on this version.
+
 ![GODOT](/logo.png)
 
 ### The Engine
